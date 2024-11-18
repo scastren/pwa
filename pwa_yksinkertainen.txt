@@ -1,0 +1,169 @@
+Tässä on ohjeet käännettynä suomeksi:
+
+---
+
+### **Tarvittavat työkalut**
+1. Perustiedot HTML-, CSS- ja JavaScript-ohjelmoinnista.
+2. Tekstieditori (esim. VS Code).
+3. Verkkoselain (mieluiten Chrome) testaamista varten.
+4. Yksinkertainen HTTP-palvelin (esim. Node.js:n `http-server`).
+
+---
+
+### **Vaiheet yksinkertaisen PWA:n luomiseen**
+
+#### 1. **Luo projektirakenne**
+- Luo kansio PWA:lle, esimerkiksi `my-pwa`.
+- Kansion sisälle luo seuraavat tiedostot:
+  ```
+  /my-pwa
+    ├── index.html
+    ├── style.css
+    ├── script.js
+    ├── manifest.json
+    ├── service-worker.js
+  ```
+
+---
+
+#### 2. **Kirjoita HTML-tiedosto (`index.html`)**
+Tämä on sovelluksesi pääsivu. Lisää viittaukset manifestitiedostoon ja rekisteröi palvelutyöntekijä.
+
+```html
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minun PWA</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <h1>Tervetuloa PWA:han</h1>
+  <p>Tämä on yksinkertainen progressiivinen verkkosovellus.</p>
+  <script src="script.js"></script>
+</body>
+</html>
+```
+
+---
+
+#### 3. **Lisää perustyylit (`style.css`)**
+Tyylittele sovelluksesi tarpeen mukaan. Esimerkki:
+```css
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin: 0;
+  padding: 20px;
+  background-color: #f0f0f0;
+}
+
+h1 {
+  color: #333;
+}
+```
+
+---
+
+#### 4. **Luo verkkosovelluksen manifestitiedosto (`manifest.json`)**
+Tämä tiedosto kertoo selaimelle sovelluksestasi ja sen toiminnasta.
+
+```json
+{
+  "name": "Yksinkertainen PWA",
+  "short_name": "PWA",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#333333",
+  "icons": [
+    {
+      "src": "icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
+```
+**Huom:** Sinun tulee luoda `icon-192x192.png` ja `icon-512x512.png` sovellustasi varten.
+
+---
+
+#### 5. **Rekisteröi palvelutyöntekijä (`script.js`)**
+Palvelutyöntekijä on olennainen offline-toiminnallisuudelle.
+
+```javascript
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./service-worker.js')
+    .then(() => console.log('Palvelutyöntekijä rekisteröity onnistuneesti.'))
+    .catch(error => console.error('Palvelutyöntekijän rekisteröinti epäonnistui:', error));
+}
+```
+
+---
+
+#### 6. **Luo palvelutyöntekijä (`service-worker.js`)**
+Palvelutyöntekijä tallentaa tiedostot välimuistiin offline-käyttöä varten.
+
+```javascript
+const CACHE_NAME = 'my-pwa-cache-v1';
+const URLS_TO_CACHE = [
+  './',
+  './index.html',
+  './style.css',
+  './script.js',
+  './icon-192x192.png',
+  './icon-512x512.png'
+];
+
+// Asennustapahtuma
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(URLS_TO_CACHE))
+  );
+});
+
+// Hakutapahtuma
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => response || fetch(event.request))
+  );
+});
+```
+
+---
+
+#### 7. **Käynnistä sovellus**
+PWA vaatii HTTPS-yhteyden. Paikallista testausta varten voit käyttää yksinkertaista HTTP-palvelinta, kuten `http-server`:
+1. Asenna `http-server`:
+   ```bash
+   npm install -g http-server
+   ```
+2. Siirry projektikansioon ja käynnistä palvelin:
+   ```bash
+   http-server -c-1
+   ```
+3. Avaa selain ja mene näytettyyn URL-osoitteeseen, esim. `http://127.0.0.1:8080`.
+
+---
+
+#### 8. **Testaa PWA:n toiminnallisuus**
+- Avaa sovellus selaimessa.
+- Tarkista sovelluksen asennettavuus:
+  1. Avaa Chrome DevTools (`Ctrl+Shift+I` / `Cmd+Shift+I`).
+  2. Siirry "Application"-välilehdelle.
+  3. Varmista, että palvelutyöntekijä on aktiivinen ja sovellus on asennettavissa.
+- Asenna sovellus klikkaamalla osoiterivillä näkyvää "Asenna"-painiketta (jos se on käytettävissä).
+
+---
+
+Onneksi olkoon! Olet luonut yksinkertaisen PWA:n! 🎉
